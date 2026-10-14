@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.lnk
+
+# Local media and generated working files
+/uploads/*
+!/uploads/.gitkeep
+/outputs/*
+!/outputs/.gitkeep
+/sample_audio.mp3
+/sample_video.mp4

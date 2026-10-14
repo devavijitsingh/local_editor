@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vortex Media Studio | Local Video & Audio Suite</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="theme-dark">
+  <div class="app-container">
+
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">VORTEX <span class="highlight">STUDIO</span></span>
+          <span class="brand-subtitle">Local Video & Audio Processing Engine</span>
+        </div>
+      </div>
+
+      <div class="nav-center">
+        <!-- Main Mode Toggle -->
+        <div class="mode-switcher" id="modeSwitcher">
+          <button class="mode-btn active" data-mode="video" id="modeBtnVideo">
+            <span class="icon">🎬</span>
+            <span>Video Studio</span>
+          </button>
+          <button class="mode-btn" data-mode="audio" id="modeBtnAudio">
+            <span class="icon">🎵</span>
+            <span>Audio Studio</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-sm" id="btnOpenFolder" title="Open Outputs Folder in Windows Explorer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Outputs Folder</span>
+        </button>
+        <button class="btn btn-ghost btn-sm" id="btnToggleOutputs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <span>Output History</span>
+          <span class="badge" id="outputCountBadge">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="main-content">
+
+      <!-- Welcome Hero (shown when no file is loaded yet) -->
+      <section class="hero-section" id="heroSection">
+        <div class="hero-badge">⚡ Powered by FFmpeg • Processed locally</div>
+        <h1 class="hero-heading">What would you like to work on today?</h1>
+        <p class="hero-subheading">Choose your workspace mode below or simply drag and drop your media file to start trimming, converting formats, or extracting audio.</p>
+
+        <div class="mode-cards-grid">
+          <!-- Video Card -->
+          <div class="studio-card" id="cardSelectVideo">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrap video-glow">
+              <span class="card-emoji">🎬</span>
+            </div>
+            <h2 class="card-title">Video Studio</h2>
+            <p class="card-desc">Trim clips with frame precision, convert formats (MP4, MKV, MOV, WEBM, GIF), or extract and trim audio tracks effortlessly.</p>
+            <ul class="card-features">
+              <li>✂️ Ultra-fast Trim (Stream Copy or Re-encode)</li>
+              <li>🔄 Format Conversion (MP4, MKV, WEBM, AVI, GIF)</li>
+              <li>🎧 Extract Audio to MP3, WAV, AAC, FLAC + Trim</li>
+            </ul>
+            <button class="btn btn-primary w-full mt-auto">Enter Video Studio</button>
+          </div>
+
+          <!-- Audio Card -->
+          <div class="studio-card" id="cardSelectAudio">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrap audio-glow">
+              <span class="card-emoji">🎵</span>
+            </div>
+            <h2 class="card-title">Audio Studio</h2>
+            <p class="card-desc">Trim music, voice notes, or podcasts with millisecond precision, apply smooth fade in/out, and convert across all audio formats.</p>
+            <ul class="card-features">
+              <li>✂️ Millisecond Waveform Trimming</li>
+              <li>🔄 Format Conversion (MP3, WAV, FLAC, AAC, OGG)</li>
+              <li>🎚️ Bitrate & Sample Rate Optimization</li>
+            </ul>
+            <button class="btn btn-accent w-full mt-auto">Enter Audio Studio</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- File Upload & Dropzone Area -->
+      <section class="upload-section">
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" class="file-input-hidden" accept="video/*,audio/*">
+          <div class="dropzone-content">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <h3 class="dropzone-title">Drag & drop your <span id="dropzoneTargetText">Video</span> file here</h3>
+            <p class="dropzone-sub">or <span class="browse-link">browse from your computer</span></p>
+            <div class="format-chips">
+              <span class="chip">MP4</span>
+              <span class="chip">MKV</span>
+              <span class="chip">MOV</span>
+              <span class="chip">WEBM</span>
+              <span class="chip">AVI</span>
+              <span class="chip">MP3</span>
+              <span class="chip">WAV</span>
+              <span class="chip">AAC</span>
+              <span class="chip">FLAC</span>
+              <span class="chip">+ All Formats</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Uploading state -->
+        <div class="upload-progress-card hidden" id="uploadProgressCard">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium" id="uploadFileName">Uploading file...</span>
+            <span class="text-xs text-muted" id="uploadPercentage">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="uploadProgressBar"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Media Workspace (appears after file upload) -->
+      <section class="workspace-section hidden" id="workspaceSection">
+
+        <!-- Media Meta Header Card -->
+        <div class="media-meta-card">
+          <div class="meta-main">
+            <div class="meta-type-badge" id="mediaTypeBadge">VIDEO</div>
+            <div class="meta-titles">
+              <h3 class="meta-filename" id="metaFilename">video.mp4</h3>
+              <div class="meta-tags" id="metaTags">
+                <span class="meta-pill" id="metaDuration">00:00:00</span>
+                <span class="meta-pill" id="metaSize">0 MB</span>
+                <span class="meta-pill" id="metaResolution">1920x1080</span>
+                <span class="meta-pill" id="metaCodec">H.264</span>
+              </div>
+            </div>
+          </div>
+          <div class="meta-actions">
+            <button class="btn btn-ghost btn-sm" id="btnReplaceFile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
+              <span>Change File</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Player & Trimming Scrubber Section -->
+        <div class="player-container">
+          <!-- Video Player Display -->
+          <div class="video-player-wrap" id="videoPlayerWrap">
+            <video id="videoElement" controls playsinline preload="metadata">
+              Your browser does not support HTML5 video.
+            </video>
+          </div>
+
+          <!-- Audio Player Display (when audio file) -->
+          <div class="audio-player-wrap hidden" id="audioPlayerWrap">
+            <div class="audio-visualizer-mock">
+              <div class="audio-wave-bars">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <audio id="audioElement" controls preload="metadata" class="w-full">
+              Your browser does not support HTML5 audio.
+            </audio>
+          </div>
+
+          <!-- Unified Precision Timeline & Scrubber Controls -->
+          <div class="timeline-box">
+            <div class="timeline-header">
+              <span class="time-label">Timeline & Range Selector</span>
+              <div class="current-timecode" id="currentTimecode">00:00:00.000</div>
+            </div>
+
+            <!-- Dual Range Sliders -->
+            <div class="range-slider-container">
+              <div class="range-track">
+                <div class="range-selected-bar" id="rangeSelectedBar"></div>
+              </div>
+              <input type="range" id="rangeSliderStart" min="0" max="100" step="0.01" value="0">
+              <input type="range" id="rangeSliderEnd" min="0" max="100" step="0.01" value="100">
+            </div>
+
+            <!-- Precision Controls & Timestamp Capture -->
+            <div class="range-controls-grid">
+              <!-- Start Time Control -->
+              <div class="time-input-group">
+                <label>Start Marker</label>
+                <div class="time-input-wrap">
+                  <input type="text" id="inputStartTime" class="time-input font-mono" value="00:00:00.000" placeholder="00:00:00.000">
+                  <button class="btn btn-secondary btn-xs" id="btnSetStart" title="Set to current playhead">
+                    📍 Mark Start
+                  </button>
+                </div>
+              </div>
+
+              <!-- Selection Summary & Preview -->
+              <div class="time-preview-group">
+                <span class="selection-duration-label">Selected Duration</span>
+                <span class="selection-duration-val font-mono" id="selectedDurationVal">00:00:00.000</span>
+                <button class="btn btn-ghost btn-xs" id="btnPreviewSelection">
+                  ▶ Preview Range
+                </button>
+              </div>
+
+              <!-- End Time Control -->
+              <div class="time-input-group">
+                <label>End Marker</label>
+                <div class="time-input-wrap">
+                  <input type="text" id="inputEndTime" class="time-input font-mono" value="00:00:00.000" placeholder="00:00:00.000">
+                  <button class="btn btn-secondary btn-xs" id="btnSetEnd" title="Set to current playhead">
+                    📍 Mark End
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Action Options Tabs -->
+        <div class="operations-panel">
+          <div class="ops-tabs-nav" id="opsTabsNav">
+            <!-- Dynamically populated or toggled depending on video vs audio -->
+          </div>
+
+          <div class="ops-content-box" id="opsContentBox">
+
+            <!-- OPTION TAB: TRIM VIDEO -->
+            <div class="op-tab-pane" id="paneVideoTrim">
+              <div class="pane-header">
+                <h3>✂️ Trim Video Clip</h3>
+                <p>Cut the video between the selected start and end markers with zero quality loss.</p>
+              </div>
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="setting-label">Processing Mode</label>
+                  <div class="segmented-control">
+                    <label class="segment-opt">
+                      <input type="radio" name="videoTrimMode" value="fast" checked>
+                      <span>⚡ Stream Copy (Ultra-Fast, Lossless)</span>
+                    </label>
+                    <label class="segment-opt">
+                      <input type="radio" name="videoTrimMode" value="precise">
+                      <span>🎯 Frame-Exact Re-encode</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <label class="setting-label">Output Format</label>
+                  <select id="videoTrimFormat" class="select-box">
+                    <option value="" selected>Same as Original</option>
+                    <option value="mp4">MP4 (.mp4)</option>
+                    <option value="mkv">MKV (.mkv)</option>
+                    <option value="mov">MOV (.mov)</option>
+                    <option value="webm">WEBM (.webm)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="execute-bar">
+                <button class="btn btn-primary btn-lg" id="btnExecuteVideoTrim">
+                  <span>✂️ Trim & Save Video</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- OPTION TAB: CONVERT VIDEO -->
+            <div class="op-tab-pane hidden" id="paneVideoConvert">
+              <div class="pane-header">
+                <h3>🔄 Convert Video Format</h3>
+                <p>Convert your video into any format with custom resolution, codec, and quality control.</p>
+              </div>
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="setting-label">Target Format</label>
+                  <div class="format-buttons-grid" id="videoTargetFormats">
+                    <button class="fmt-btn active" data-fmt="mp4">MP4</button>
+                    <button class="fmt-btn" data-fmt="mkv">MKV</button>
+                    <button class="fmt-btn" data-fmt="webm">WEBM</button>
+                    <button class="fmt-btn" data-fmt="mov">MOV</button>
+                    <button class="fmt-btn" data-fmt="avi">AVI</button>
+                    <button class="fmt-btn" data-fmt="gif">Animated GIF</button>
+                    <button class="fmt-btn" data-fmt="flv">FLV</button>
+                    <button class="fmt-btn" data-fmt="wmv">WMV</button>
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <label class="setting-label">Target Resolution</label>
+                  <select id="videoResolution" class="select-box">
+                    <option value="original" selected>Keep Original Resolution</option>
+                    <option value="3840:2160">4K Ultra HD (3840 x 2160)</option>
+                    <option value="1920:1080">Full HD 1080p (1920 x 1080)</option>
+                    <option value="1280:720">HD 720p (1280 x 720)</option>
+                    <option value="854:480">SD 480p (854 x 480)</option>
+                  </select>
+                </div>
+
+                <div class="setting-item">
+                  <label class="setting-label">Quality (CRF)</label>
+                  <div class="range-field">
+                    <input type="range" id="videoCrf" min="16" max="32" value="22" class="slider-full">
+                    <div class="flex justify-between text-xs text-muted mt-1">
+                      <span>Highest Quality (16)</span>
+                      <span id="crfValueDisplay">Balanced (22)</span>
+                      <span>Smaller File (32)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="execute-bar">
+                <button class="btn btn-primary btn-lg" id="btnExecuteVideoConvert">
+                  <span>🔄 Convert Video</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- OPTION TAB: EXTRACT AUDIO FROM VIDEO (Highlighted user requirement) -->
+            <div class="op-tab-pane hidden" id="paneVideoExtract">
+              <div class="pane-header">
+                <h3>🎧 Extract Audio from Video</h3>
+                <p>Pull out pristine audio tracks from any video and optionally trim to your selected timeline markers.</p>
+              </div>
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="setting-label">Target Audio Format</label>
+                  <div class="format-buttons-grid" id="extractAudioFormats">
+                    <button class="fmt-btn active" data-fmt="mp3">MP3</button>
+                    <button class="fmt-btn" data-fmt="wav">WAV (Lossless)</button>
+                    <button class="fmt-btn" data-fmt="aac">AAC</button>
+                    <button class="fmt-btn" data-fmt="flac">FLAC (Lossless)</button>
+                    <button class="fmt-btn" data-fmt="m4a">M4A</button>
+                    <button class="fmt-btn" data-fmt="ogg">OGG</button>
+                    <button class="fmt-btn" data-fmt="opus">OPUS</button>
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <label class="setting-label">Audio Bitrate / Quality</label>
+                  <select id="extractBitrate" class="select-box">
+                    <option value="320k">320 kbps (Extreme High Quality)</option>
+                    <option value="256k">256 kbps (Studio Quality)</option>
+                    <option value="192k" selected>192 kbps (Standard High)</option>
+                    <option value="128k">128 kbps (Compact)</option>
+                  </select>
+                </div>
+
+                <div class="setting-item span-full">
+                  <div class="checkbox-card">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="extractTrimCheckbox" checked>
+                      <span class="custom-chk"></span>
+                      <div class="chk-text">
+                        <strong>Trim Audio to Timeline Range</strong>
+                        <p class="text-xs text-muted">Only extract between Marked Start (<span id="extractStartDisp">00:00:00</span>) and End (<span id="extractEndDisp">00:00:00</span>). Uncheck to extract entire video's audio.</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="execute-bar">
+                <button class="btn btn-accent btn-lg" id="btnExecuteExtractAudio">
+                  <span>🎧 Extract & Save Audio</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- OPTION TAB: TRIM AUDIO (For Audio Studio Mode) -->
+            <div class="op-tab-pane hidden" id="paneAudioTrim">
+              <div class="pane-header">
+                <h3>✂️ Trim Audio</h3>
+                <p>Snip sound bites, songs, or interviews with millisecond accuracy and smooth fades.</p>
+              </div>
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="setting-label">Fade In Effect (Seconds)</label>
+                  <select id="audioFadeIn" class="select-box">
+                    <option value="0" selected>None</option>
+                    <option value="0.5">0.5 seconds</option>
+                    <option value="1.0">1.0 second</option>
+                    <option value="2.0">2.0 seconds</option>
+                  </select>
+                </div>
+
+                <div class="setting-item">
+                  <label class="setting-label">Fade Out Effect (Seconds)</label>
+                  <select id="audioFadeOut" class="select-box">
+                    <option value="0" selected>None</option>
+                    <option value="0.5">0.5 seconds</option>
+                    <option value="1.0">1.0 second</option>
+                    <option value="2.0">2.0 seconds</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="execute-bar">
+                <button class="btn btn-accent btn-lg" id="btnExecuteAudioTrim">
+                  <span>✂️ Trim & Save Audio</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- OPTION TAB: CONVERT AUDIO (For Audio Studio Mode) -->
+            <div class="op-tab-pane hidden" id="paneAudioConvert">
+              <div class="pane-header">
+                <h3>🔄 Convert Audio Format</h3>
+                <p>Convert audio tracks to MP3, WAV, AAC, FLAC, OGG, or OPUS with customizable bitrates.</p>
+              </div>
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="setting-label">Target Format</label>
+                  <div class="format-buttons-grid" id="audioTargetFormats">
+                    <button class="fmt-btn active" data-fmt="mp3">MP3</button>
+                    <button class="fmt-btn" data-fmt="wav">WAV</button>
+                    <button class="fmt-btn" data-fmt="aac">AAC</button>
+                    <button class="fmt-btn" data-fmt="flac">FLAC</button>
+                    <button class="fmt-btn" data-fmt="m4a">M4A</button>
+                    <button class="fmt-btn" data-fmt="ogg">OGG</button>
+                    <button class="fmt-btn" data-fmt="opus">OPUS</button>
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <label class="setting-label">Bitrate</label>
+                  <select id="audioConvertBitrate" class="select-box">
+                    <option value="320k" selected>320 kbps</option>
+                    <option value="256k">256 kbps</option>
+                    <option value="192k">192 kbps</option>
+                    <option value="128k">128 kbps</option>
+                  </select>
+                </div>
+
+                <div class="setting-item">
+                  <label class="setting-label">Sample Rate</label>
+                  <select id="audioConvertSampleRate" class="select-box">
+                    <option value="auto" selected>Auto (Same as Original)</option>
+                    <option value="44100">44.1 kHz (CD Standard)</option>
+                    <option value="48000">48.0 kHz (Studio Standard)</option>
+                    <option value="96000">96.0 kHz (Hi-Res)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="execute-bar">
+                <button class="btn btn-accent btn-lg" id="btnExecuteAudioConvert">
+                  <span>🔄 Convert Audio</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Result Banner Card (Appears after successful processing) -->
+      <section class="result-section hidden" id="resultSection">
+        <div class="result-card">
+          <div class="result-badge">🎉 Processing Complete!</div>
+          <h3 class="result-title" id="resultFilename">clip_trimmed.mp4</h3>
+          <p class="result-meta" id="resultMeta">Size: 14.2 MB • Processed in 0.8s</p>
+
+          <div class="result-preview-wrap" id="resultPreviewWrap">
+            <!-- Inline player dynamically inserted here -->
+          </div>
+
+          <div class="result-actions">
+            <a href="#" class="btn btn-primary" id="btnDownloadResult" download>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Download File</span>
+            </a>
+            <button class="btn btn-secondary" id="btnOpenFolderFromResult">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Show in Folder</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Outputs Drawer / Vault -->
+      <aside class="outputs-drawer" id="outputsDrawer">
+        <div class="drawer-header">
+          <div class="drawer-title-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="drawer-icon">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <h2>Output Library</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-secondary btn-xs" id="btnOpenDrawerFolder">Open Folder</button>
+            <button class="drawer-close-btn" id="btnCloseDrawer">✕</button>
+          </div>
+        </div>
+
+        <div class="drawer-body" id="outputsListContainer">
+          <div class="empty-state">
+            <p>No processed files yet.</p>
+            <p class="text-xs text-muted">Trimmed clips, converted formats, and extracted audio will appear here.</p>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+
+    <!-- Modal Backdrop for Loading Spinner -->
+    <div class="modal-backdrop hidden" id="processingModal">
+      <div class="processing-card">
+        <div class="spinner-ring"></div>
+        <h3 class="processing-title">Processing Media with FFmpeg...</h3>
+        <p class="processing-desc" id="processingStatusText">Encoding frames and rendering audio streams locally.</p>
+        <div class="pulse-bar"></div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
